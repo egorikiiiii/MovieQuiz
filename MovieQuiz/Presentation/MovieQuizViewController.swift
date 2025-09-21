@@ -49,7 +49,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     func didFailToLoadData(with error: Error) {
-        print("breakpoint1")
         activityIndicator.isHidden = true
         showNetworkError(message: error.localizedDescription)
     }
@@ -63,8 +62,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private func showNetworkError(message: String) {
         let model = AlertModel(title: "Ошибка",
-                                   message: message,
-                                   buttonText: "Попробовать еще раз") { [weak self] in
+                               message: message,
+                               buttonText: "Попробовать еще раз") { [weak self] in
                 guard let self = self else { return }
             
                 self.showLoadingIndicator()
