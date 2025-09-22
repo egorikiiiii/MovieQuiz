@@ -10,7 +10,7 @@ import UIKit
 final class MovieQuizPresenter: QuestionFactoryDelegate {
     // MARK: - Properties
     
-    private let statisticService: StatisticServiceProtocol!
+    private let statisticService: StatisticServiceProtocol
     var questionFactory: QuestionFactoryProtocol?
     weak var viewController: MovieQuizViewControllerProtocol?
     
@@ -80,41 +80,32 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         return questionStep
     }
     
-    func noButtonClicked() {
-        didAnswer(isYes: false)
-    }
-    
-    func yesButtonClicked() {
-        didAnswer(isYes: true)
-    }
-    
     func didAnswer(isCorrectAnswer: Bool) {
         correctAnswers += isCorrectAnswer ? 1 : 0
     }
     
-    private func didAnswer(isYes: Bool) {
+    func didAnswer(isYes: Bool) {
         guard let currentQuestion else { return }
-        let givenAnswer = isYes
-        proceedWithAnswer(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        proceedWithAnswer(isCorrect: isYes == currentQuestion.correctAnswer)
     }
     
     func makeResultsMessage() -> String {
-            statisticService.store(correct: correctAnswers, total: questionsAmount)
-            
-            let bestGame = statisticService.bestGame
+        statisticService.store(correct: correctAnswers, total: questionsAmount)
         
-            let currentGameResultLine = "Ваш результат: \(correctAnswers)\\\(questionsAmount)"
-            let totalPlaysCountLine = "Количество сыгранных квизов: \(statisticService.gamesCount)"
-            let bestGameInfoLine = "Рекорд: \(bestGame.correct)\\\(bestGame.total)"
-                    + " (\(bestGame.date.dateTimeString))"
-            let averageAccuracyLine = "Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%"
-            
-            let resultMessage = [
-                currentGameResultLine, totalPlaysCountLine, bestGameInfoLine, averageAccuracyLine
-            ].joined(separator: "\n")
-            
-            return resultMessage
-        }
+        let bestGame = statisticService.bestGame
+        
+        let currentGameResultLine = "Ваш результат: \(correctAnswers)\\\(questionsAmount)"
+        let totalPlaysCountLine = "Количество сыгранных квизов: \(statisticService.gamesCount)"
+        let bestGameInfoLine = "Рекорд: \(bestGame.correct)\\\(bestGame.total)"
+        + " (\(bestGame.date.dateTimeString))"
+        let averageAccuracyLine = "Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%"
+        
+        let resultMessage = [
+            currentGameResultLine, totalPlaysCountLine, bestGameInfoLine, averageAccuracyLine
+        ].joined(separator: "\n")
+        
+        return resultMessage
+    }
     
     func proceedWithAnswer(isCorrect: Bool) {
         didAnswer(isCorrectAnswer: isCorrect)
@@ -126,7 +117,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     }
     
     func proceedToNextQuestionOrResults() {
-        if self.isLastQuestion() {
+        if isLastQuestion() {
             statisticService.store(correct: correctAnswers, total: self.questionsAmount)
             let quizResults = QuizResultsViewModel(
                 title: "Этот раунд окончен!",
@@ -135,7 +126,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
             )
             viewController?.show(quiz: quizResults)
         } else {
-            self.switchToNextQuestion()
+            switchToNextQuestion()
             questionFactory?.requestNextQuestion()
         }
     }

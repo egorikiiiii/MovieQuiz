@@ -12,13 +12,14 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     
     // MARK: - Private Properties
-    private var presenter: MovieQuizPresenter!
+    private lazy var presenter: MovieQuizPresenter = MovieQuizPresenter(viewController: self)
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         configureFonts()
         configureImageBorders()
+        configureLoadingIndicator()
         presenter = MovieQuizPresenter(viewController: self)
     }
     
@@ -37,13 +38,15 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
         imageView.layer.cornerRadius = 20
     }
     
+    private func configureLoadingIndicator() {
+        activityIndicator.hidesWhenStopped = true
+    }
+    
     func showLoadingIndicator() {
-        activityIndicator.isHidden = false
         activityIndicator.startAnimating()
     }
     
     func hideLoadingIndicator() {
-        activityIndicator.isHidden = true
         activityIndicator.stopAnimating()
     }
     
@@ -110,10 +113,10 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     
     // MARK: - IBActions
     @IBAction private func noButtonClicked(_ sender: Any) {
-        presenter.noButtonClicked()
+        presenter.didAnswer(isYes: false)
     }
     
     @IBAction private func yesButtonClicked(_ sender: Any) {
-        presenter.yesButtonClicked()
+        presenter.didAnswer(isYes: true)
     }
 }
